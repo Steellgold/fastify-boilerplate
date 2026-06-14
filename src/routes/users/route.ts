@@ -11,12 +11,6 @@ const route: FastifyPluginAsync = async (fastify) => {
     usersController.list,
   )
 
-  fastify.get(
-    "/:id",
-    { preHandler: [authMiddleware, requirePermission(Permissions.USER_READ)] },
-    usersController.getById,
-  )
-
   fastify.post(
     "/",
     { preHandler: [authMiddleware, requirePermission(Permissions.USER_CREATE)] },

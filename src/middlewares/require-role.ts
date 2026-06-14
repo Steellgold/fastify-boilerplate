@@ -8,7 +8,7 @@ import type { FastifyRequest } from "fastify"
  */
 export const requirePermission = (...permissions: Permission[]) =>
   async (request: FastifyRequest) => {
-    const role = request.userSession?.user.role as SystemRole | undefined
+    const role = request.auth?.user.role as SystemRole | undefined
     if (!role || !hasAllPermissions(role, permissions)) {
       throw new ForbiddenError()
     }
@@ -20,7 +20,7 @@ export const requirePermission = (...permissions: Permission[]) =>
  */
 export const requireRole = (...roles: SystemRole[]) =>
   async (request: FastifyRequest) => {
-    const role = request.userSession?.user.role as SystemRole | undefined
+    const role = request.auth?.user.role as SystemRole | undefined
     if (!role || !roles.includes(role)) {
       throw new ForbiddenError()
     }

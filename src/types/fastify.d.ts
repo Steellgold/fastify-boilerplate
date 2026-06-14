@@ -12,7 +12,7 @@ declare module "fastify" {
      * Authenticated user session, injected by `authMiddleware`.
      * `null` when no valid session is present.
      */
-    userSession: NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>> extends infer S
+    auth: NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>> extends infer S
       ? {
           user: Omit<S["user"], "name"> & { name: string | null }
           session: S["session"]

@@ -4,7 +4,7 @@ import type { FastifyRequest } from "fastify"
 
 /**
  * Fastify `preHandler` that extracts the current user session via Better Auth.
- * Injects `request.userSession` on success, throws 401 otherwise.
+ * Injects `request.auth` on success, throws 401 otherwise.
  */
 export const authMiddleware = async (request: FastifyRequest) => {
   const session = await request.server.auth.api.getSession({
@@ -13,7 +13,7 @@ export const authMiddleware = async (request: FastifyRequest) => {
 
   if (!session) throw new UnauthorizedError()
 
-  request.userSession = {
+  request.auth = {
     user: {
       ...session.user,
       name: session.user.name ?? null,
