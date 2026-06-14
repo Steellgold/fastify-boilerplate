@@ -1,10 +1,13 @@
-import { buildApp } from "@/app"
+import { app } from "@/app"
 import { env } from "@/config/env"
 
-try {
-  const app = await buildApp()
-  await app.listen({ port: env.PORT, host: env.HOST })
-} catch (err) {
-  console.error("Failed to start server:", err)
-  process.exit(1)
+const start = async () => {
+  try {
+    await app.listen({ port: env.PORT, host: env.HOST })
+  } catch (err) {
+    app.log.error(err)
+    process.exit(1)
+  }
 }
+
+start()
