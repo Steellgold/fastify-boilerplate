@@ -9,7 +9,7 @@ import { z } from "zod"
 export const usersController = {
   /** GET /user — current user profile. */
   getSelf: async (request: FastifyRequest, reply: FastifyReply) => {
-    const user = await usersService.findById(request.userSession!.user.id)
+    const user = await usersService.findById(request.auth!.user.id)
     return reply.send(successResponse(user))
   },
 
@@ -18,7 +18,10 @@ export const usersController = {
     const parsed = updateUserSchema.safeParse(request.body)
     if (!parsed.success) throw new ValidationError(z.treeifyError(parsed.error))
 
-    const user = await usersService.update(request.userSession!.user.id, parsed.data)
+    const user = await usersService.update(request.auth!.user.id, parsed.data)
+    request.server.auditLog.log("user.update", "User", request.auth!.user.id, {
+      changed: Object.keys(parsed.data).join(", "),
+    })
     return reply.send(successResponse(user))
   },
 
@@ -46,6 +49,7 @@ export const usersController = {
     if (!parsed.success) throw new ValidationError(z.treeifyError(parsed.error))
 
     const user = await usersService.create(parsed.data)
+    request.server.auditLog.log("user.create", "User", user.id, { email: parsed.data.email })
     return reply.status(201).send(successResponse(user))
   },
 
@@ -58,6 +62,9 @@ export const usersController = {
     if (!bodyParsed.success) throw new ValidationError(z.treeifyError(bodyParsed.error))
 
     const user = await usersService.update(paramsParsed.data.id, bodyParsed.data)
+    request.server.auditLog.log("user.update", "User", paramsParsed.data.id, {
+      changed: Object.keys(bodyParsed.data).join(", "),
+    })
     return reply.send(successResponse(user))
   },
 
@@ -67,6 +74,7 @@ export const usersController = {
     if (!parsed.success) throw new ValidationError(z.treeifyError(parsed.error))
 
     await usersService.remove(parsed.data.id)
+    request.server.auditLog.log("user.delete", "User", parsed.data.id)
     return reply.status(204).send()
   },
 }
